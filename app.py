@@ -4,7 +4,7 @@ import math
 from  datetime import timezone
 import altair as alt
 
-#libraries and set up for Open-Meteo API
+# libraries and set up for Open-Meteo API
 import openmeteo_requests
 import requests_cache
 from retry_requests import retry
@@ -12,11 +12,9 @@ cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
 retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
 openmeteo = openmeteo_requests.Client(session = retry_session)
 
-#Libraries and set up for SkyField API
+# Libraries and set up for SkyField API
 from skyfield.api import load, wgs84
-from skyfield.api import N, W, S, E
-from skyfield.almanac import moon_phases
-from datetime import datetime
+
 eph = load('de421.bsp')
 earth = eph['earth']
 
@@ -24,7 +22,7 @@ earth = eph['earth']
 from streamlit_js_eval import get_geolocation
 
 
-#coordinates top 50 major cities sorted in alpha order
+# coordinates top 50 major cities sorted in alpha order
 MAJOR_CITIES = {
     "Atlanta": {"latitude": 33.7490, "longitude": -84.3880},
     "Austin": {"latitude": 30.2672, "longitude": -97.7431},
@@ -78,7 +76,7 @@ MAJOR_CITIES = {
     "Washington DC": {"latitude": 38.9072, "longitude": -77.0369}
 }
 
-#constanst describing weight of penalty each element has on viewing_score
+# constants describing weight of penalty each element has on viewing_score
 TYPE_WEIGHTS = {
     "faint": {
         "max_cloud_penalty": 35.0,
@@ -108,7 +106,7 @@ penalties = {"cloud_penalty": [],
 
 
 
-#display/run body of website
+# display/run body of website
 def display_visual(user_lat: str,
                     user_lon: str,):
 
@@ -433,7 +431,7 @@ user_location = {}
 
 
 
-#create basic UI layout
+# create basic UI layout
 st.markdown(
     """
     <style>
@@ -453,12 +451,13 @@ with st.expander("How the Viewing Score is Calculated"):
     
     * **Cloud Cover & Visibility:** Pulled live via Open-Meteo API to measure atmospheric clarity.
     * **Planetary Altitude:** Calculated via Skyfield ephemerides using airmass extinction formulas to penalize objects that are low or below the horizon
-    * **Moon Illumination & Light Pollution:** Factors in lunar phase brightness and localized Bortle scale estimates to measure sky glow.
+    * **Moon Illumination & Light Pollution:** Factors in lunar phase brightness and localized Bortle scale in order to measure and penalize sky glow.
     """)
 st.sidebar.header("Location Settings")
 use_manual = st.sidebar.checkbox("Manually Select City")
 
-#if user choses to manually select a city
+
+# if user choses to manually select a city
 if use_manual:
     selected_city = st.sidebar.selectbox("Select City", list(MAJOR_CITIES.keys()))
     user_location = MAJOR_CITIES[selected_city]
@@ -469,13 +468,17 @@ if use_manual:
 
 # if user allows exact location to be accessed
 elif location_data:
-  
-    user_lat = location_data['coords']['latitude']
-    user_lon = location_data['coords']['longitude']
-    display_visual(user_lat = user_lat, user_lon = user_lon)
+    if location_data and 'coords' in location_data and location_data['coords']:
+        user_lat = location_data['coords']['latitude']
+        user_lon = location_data['coords']['longitude']
+        display_visual(user_lat = user_lat, user_lon = user_lon)
+    else:
+        user_lat = 51.4769
+        user_lon = 0.0005
+        st.info("Using default coordinates. Please allow location access or manually enter a city")
     
     
-#if user has not selected any form of location
+# if user has not selected any form of location
 else:
     st.write("Please allow location access in order to continue")
     st.write("See menu (top left) in order to manually select a location")
