@@ -416,7 +416,7 @@ def display_visual(user_lat: str,
 
 
     #get planet and day of week selected from user
-    day_of_week = st.selectbox("Which day of the week?", list(ordered_days), width = 200)
+    
     with col1:
         planet_choice = st.selectbox(label = "Select a Planet", options = planets, width = 100)
     with col2:
