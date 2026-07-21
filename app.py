@@ -432,6 +432,7 @@ user_location = {}
 
 
 # create basic UI layout
+st.set_page_config(initial_sidebar_state="expanded")
 st.markdown(
     """
     <style>
@@ -474,7 +475,7 @@ elif location_data:
         display_visual(user_lat = user_lat, user_lon = user_lon)
     else:
         
-        st.info("Please allow location access or manually enter a city")
+        st.info("Please allow location access or manually enter a city. ")
     
     
 # if user has not selected any form of location
