@@ -1,10 +1,10 @@
-st.set_page_config(initial_sidebar_state="expanded")
+
 import streamlit as st
 import pandas as pd
 import math
 from  datetime import timezone
 import altair as alt
-
+st.set_page_config(initial_sidebar_state="expanded")
 # libraries and set up for Open-Meteo API
 import openmeteo_requests
 import requests_cache
