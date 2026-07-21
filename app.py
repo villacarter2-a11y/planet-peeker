@@ -415,7 +415,7 @@ def display_visual(user_lat: str,
 
 
     #get day of week selected from user
-    day_of_week = st.selectbox("Which day of the week?", list(ordered_days), width = 100)
+    day_of_week = st.selectbox("Which day of the week?", list(ordered_days), width = 200)
 
     #get data for week and planet selected by user and draw graph to visualize the data
     final_data = get_graph_data(day_of_week = day_of_week, planet_choice = planet_choice)
