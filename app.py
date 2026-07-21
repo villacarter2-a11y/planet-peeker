@@ -484,12 +484,12 @@ elif location_data:
             """)
     else:
         
-        st.info("Please allow location access or manually enter a city. See button for menu labeled '>>' on the top left of the page")
+        st.info('Please allow location access or manually enter a city. See button for menu labeled ">>" on the top left of the page')
     
     
 # if user has not selected any form of location
 else:
-    st.write("Please allow location access in order to continue. See button for menu labeled '>>' on the top left of the page")
+    st.write('Please allow location access in order to continue. See button for menu labeled ">>"" on the top left of the page')
     
 
 
