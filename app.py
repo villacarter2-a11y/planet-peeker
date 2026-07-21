@@ -446,7 +446,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 st.title("Planet Peeker", text_alignment='center')
-st.caption("### *An Astronomical Analysis & Observation Tool*", text_alignment = 'center')
+st.caption("### *Astronomical Observation & Visibility Analystics Tool*", text_alignment = 'center')
 st.sidebar.header("Location Settings")
 use_manual = st.sidebar.checkbox("Manually Select City")
 
