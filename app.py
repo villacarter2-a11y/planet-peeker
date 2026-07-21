@@ -135,7 +135,8 @@ def display_visual(user_lat: str,
         if (max(final_data[0]) == 0):
             st.warning(f"{planet_choice} is not visible on {day_of_week} due to a/an {chart_df['worst_penalty_name'][0].replace('_', ' ').title()}")
 
-        
+        elif (min(final_data[0]) == 0):
+            st.warning (f"{planet_choice} may not be visible some hours due to having an altitiude below horizon or full cloud coverage")
 
         chart = alt.Chart(chart_df).mark_bar().encode(
             x = alt.X('time:O', sort = None),
@@ -446,14 +447,6 @@ st.markdown(
 )
 st.title("Planet Peeker", text_alignment='center')
 st.caption("### *An Astronomical Analysis & Observation Tool*", text_alignment = 'center')
-with st.expander("How the Viewing Score is Calculated"):
-    st.markdown("""
-    **Planet Peeker** evaluates real-time atmospheric and orbital conditions to determine the optimal window for viewing planets in our solar system.
-    
-    * **Cloud Cover & Visibility:** Pulled live via Open-Meteo API to measure atmospheric clarity.
-    * **Planetary Altitude:** Calculated via Skyfield ephemerides using airmass extinction formulas to penalize objects that are low or below the horizon
-    * **Moon Illumination & Light Pollution:** Factors in lunar phase brightness and localized Bortle scale in order to measure and penalize sky glow.
-    """)
 st.sidebar.header("Location Settings")
 use_manual = st.sidebar.checkbox("Manually Select City")
 
@@ -464,7 +457,15 @@ if use_manual:
     user_location = MAJOR_CITIES[selected_city]
     user_lat = user_location["latitude"]  
     user_lon = user_location["longitude"]
-    display_visual(user_lat = user_lat, user_lon = user_lon) 
+    display_visual(user_lat = user_lat, user_lon = user_lon)
+    with st.expander("How the Viewing Score is Calculated"):
+        st.markdown("""
+        **Planet Peeker** evaluates real-time atmospheric and orbital conditions to determine the optimal window for viewing planets in our solar system.
+        
+        * **Cloud Cover & Visibility:** Pulled live via Open-Meteo API to measure atmospheric clarity.
+        * **Planetary Altitude:** Calculated via Skyfield ephemerides using airmass extinction formulas to penalize objects that are low or below the horizon
+        * **Moon Illumination & Light Pollution:** Factors in lunar phase brightness and localized Bortle scale in order to measure and penalize sky glow.
+        """)
     
 
 # if user allows exact location to be accessed
@@ -473,6 +474,14 @@ elif location_data:
         user_lat = location_data['coords']['latitude']
         user_lon = location_data['coords']['longitude']
         display_visual(user_lat = user_lat, user_lon = user_lon)
+        with st.expander("How the Viewing Score is Calculated"):
+            st.markdown("""
+            **Planet Peeker** evaluates real-time atmospheric and orbital conditions to determine the optimal window for viewing planets in our solar system.
+            
+            * **Cloud Cover & Visibility:** Pulled live via Open-Meteo API to measure atmospheric clarity.
+            * **Planetary Altitude:** Calculated via Skyfield ephemerides using airmass extinction formulas to penalize objects that are low or below the horizon
+            * **Moon Illumination & Light Pollution:** Factors in lunar phase brightness and localized Bortle scale in order to measure and penalize sky glow.
+            """)
     else:
         
         st.info("Please allow location access or manually enter a city. ")
