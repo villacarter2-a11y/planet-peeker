@@ -1,0 +1,8 @@
+streamlit
+pandas
+altair
+openmeteo-requests
+requests_cache
+retry_requests
+skyfield
+streamlit_js_eval
