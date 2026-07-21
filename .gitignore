@@ -1,0 +1,4 @@
+*.bsp
+.cache*
+__pycache__/
+.vscode/
