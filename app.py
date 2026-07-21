@@ -1,3 +1,4 @@
+st.set_page_config(initial_sidebar_state="expanded")
 import streamlit as st
 import pandas as pd
 import math
@@ -432,7 +433,6 @@ user_location = {}
 
 
 # create basic UI layout
-st.set_page_config(initial_sidebar_state="expanded")
 st.markdown(
     """
     <style>
