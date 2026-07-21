@@ -407,7 +407,7 @@ def display_visual(user_lat: str,
 
     # create a button for user to select a Planet
     planets = {"Mercury": "bright" , "Venus": "bright", "Mars": "bright", 'Jupiter': "bright", "Saturn": "bright", "Uranus": "faint", "Neptune": "faint"}
-    planet_choice = st.selectbox(label = "Select a Planet", options = planets, width = 100)
+    planet_choice = st.selectbox(label = "Select a Planet", options = planets)
 
 
     # find target_index of day -> use to find sunrise/sunset and the days hourly data
