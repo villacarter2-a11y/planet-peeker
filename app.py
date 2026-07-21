@@ -133,10 +133,10 @@ def display_visual(user_lat: str,
         
         #add warning if every hour shows score of 0
         if (max(final_data[0]) == 0):
-            st.warning(f"{planet_choice} is not visible on {day_of_week} due to a/an {chart_df['worst_penalty_name'][0].replace('_', ' ').title()}")
+            st.warning(f"{planet_choice} is not visible on {day_of_week} due to a/an {chart_df['worst_penalty_name'][0].replace('_', ' ').title()}.")
 
         elif (min(final_data[0]) == 0):
-            st.warning (f"{planet_choice} may not be visible some hours due to having an altitude below the horizon or full cloud coverage")
+            st.warning (f"{planet_choice} may not be visible some hours due to having an altitude below the horizon or full cloud coverage.")
 
         chart = alt.Chart(chart_df).mark_bar().encode(
             x = alt.X('time:O', sort = None),
