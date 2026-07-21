@@ -473,9 +473,8 @@ elif location_data:
         user_lon = location_data['coords']['longitude']
         display_visual(user_lat = user_lat, user_lon = user_lon)
     else:
-        user_lat = 51.4769
-        user_lon = 0.0005
-        st.info("Using default coordinates. Please allow location access or manually enter a city")
+        
+        st.info("Please allow location access or manually enter a city")
     
     
 # if user has not selected any form of location
