@@ -124,29 +124,43 @@ def display_visual(user_lat: str,
             "bortle_penalty": penalties["bortle_penalty"],
             "altitude_penalty": penalties["altitude_penalty"],
         })
-       
-        penalty_cols = ["moon_penalty", "altitude_penalty", "cloud_penalty", "visibility_penalty", "bortle_penalty"]
-        chart_df['score'] = pd.to_numeric(chart_df['score'])
+       # map column names to clean display names
 
+       # define clean names for UI display
+        display_names = {
+            "altitude_penalty": "Altitude",
+            "cloud_penalty": "Cloud Coverage",
+            "moon_penalty": "Moonlight Interference",
+            "visibility_penalty": "Atmospheric Visibility",
+            "bortle_penalty": "Light Pollution"
+        }
+
+        penalty_cols = ["moon_penalty", "altitude_penalty", "cloud_penalty", "visibility_penalty", "bortle_penalty"]
+
+        # find min and max penalties
         chart_df["worst_penalty_name"] = chart_df[penalty_cols].idxmax(axis=1)
         chart_df["least_penalty_name"] = chart_df[penalty_cols].idxmin(axis=1)
-        
-        #add warning if every hour shows score of 0
-        if (max(final_data[0]) == 0):
-            st.warning(f"{planet_choice} is not visible on {day_of_week} due to a/an {chart_df['worst_penalty_name'][0].replace('_', ' ').title()}.")
 
-        elif (min(final_data[0]) == 0):
-            st.warning (f"{planet_choice} may not be visible some hours due to having an altitude below the horizon or full cloud coverage.")
+        # map raw code names to UI ready text
+        chart_df["Worst Factor" ] = chart_df["worst_penalty_name"].map(display_names)
+        chart_df["Best Factor"] = chart_df["least_penalty_name"].map(display_names)
+
+        
+
+       
+        
+        
+        
 
         chart = alt.Chart(chart_df).mark_bar().encode(
-            x = alt.X('time:O', sort = None),
+            x = alt.X('time:O', axis = alt.Axis(labelAngle = 0, title = 'Time'), sort = None),
             y = alt.Y('score:Q', scale = alt.Scale(domain = [0,100])),
 
             #show user tooltip of score, penalty most affecting score, penalty least affecting score
             tooltip = [
                 alt.Tooltip('score:Q', title = 'Score'),
-                alt.Tooltip('worst_penalty_name:N', title = 'Worst Factor'),
-                alt.Tooltip('least_penalty_name:N', title = 'Best Factor'),
+                alt.Tooltip('Worst Factor:N', title = 'Worst Factor'),
+                alt.Tooltip('Best Factor:N', title = 'Best Factor'),
             ],
             # color code bars based on viewing scores
             color = alt.Color(
@@ -162,6 +176,12 @@ def display_visual(user_lat: str,
 
         )
         st.altair_chart(chart, width = 'stretch')
+        #add warning if every hour shows score of 0
+        if (max(final_data[0]) == 0):
+            st.caption(f"{planet_choice} is not visible on {day_of_week} due to a/an {chart_df['worst_penalty_name'][0].replace('_', ' ').title()}.")
+
+        elif (min(final_data[0]) == 0):
+            st.caption (f"{planet_choice} may not be visible some hours due to having an altitude below the horizon or full cloud coverage.", text_alignment = 'center')
         st.caption("Showing viewing scores for the full calendar day (12 AM – 11 PM). Daylight hours with no visibility are excluded.", text_alignment = 'center')
     
     # calculates an estimated score from 0-100 based on the users ability to experience chosen planet
@@ -404,7 +424,7 @@ def display_visual(user_lat: str,
 
 
     
-    col1, col2 = st.columns(2)
+    _, col1, col2, _ = st.columns([2,3,3,2])
   
     planets = {"Mercury": "bright" , "Venus": "bright", "Mars": "bright", 'Jupiter': "bright", "Saturn": "bright", "Uranus": "faint", "Neptune": "faint"}
     
@@ -420,7 +440,7 @@ def display_visual(user_lat: str,
     with col1:
         planet_choice = st.selectbox(label = "Select a Planet", options = planets, width = 100)
     with col2:
-        day_of_week = st.selectbox("Which day of the week?", list(ordered_days), width = 200)
+        day_of_week = st.selectbox("Which day?", list(ordered_days), width = 200)
         
 
     #get data for week and planet selected by user and draw graph to visualize the data
@@ -428,7 +448,7 @@ def display_visual(user_lat: str,
     draw_graph(penalties = penalties)
 
 
-# Make sure all required weather variables are listed here
+# all required weather variables are listed here
 
 url = "https://api.open-meteo.com/v1/forecast"
 
@@ -452,7 +472,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 st.title("Planet Peeker", text_alignment='center')
-st.caption("### *Astronomical Observation & Visibility Analystics Tool*", text_alignment = 'center')
+st.caption("*Astronomical Observation & Visibility Analystics Tool*", text_alignment = 'center')
 st.sidebar.header("Location Settings")
 use_manual = st.sidebar.checkbox("Manually Select City")
 
