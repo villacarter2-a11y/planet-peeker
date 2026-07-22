@@ -154,7 +154,7 @@ def display_visual(user_lat: str,
 
         chart = alt.Chart(chart_df).mark_bar().encode(
             x = alt.X('time:O', axis = alt.Axis(labelAngle = 0, title = 'Time'), sort = None),
-            y = alt.Y('score:Q', axis = alt.Axis(title = 'Viewing Score'), scale = alt.Scale(domain = [0,100]))
+            y = alt.Y('score:Q', axis = alt.Axis(title = 'Viewing Score'), scale = alt.Scale(domain = [0,100])),
 
             #show user tooltip of score, penalty most affecting score, penalty least affecting score
             tooltip = [
