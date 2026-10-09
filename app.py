@@ -7,6 +7,7 @@ import altair as alt
 st.set_page_config(initial_sidebar_state="expanded")
 # libraries and set up for Open-Meteo API
 import openmeteo_requests
+from zoneinfo import ZoneInfo
 import requests_cache
 from retry_requests import retry
 cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
@@ -178,7 +179,7 @@ def display_visual(user_lat: str,
         st.altair_chart(chart, width = 'stretch')
         #add warning if every hour shows score of 0
         if (max(final_data[0]) == 0):
-            st.caption(f"{planet_choice} is not visible on {day_of_week} due to a/an {chart_df['worst_penalty_name'][0].replace('_', ' ').title()}.")
+            st.caption(f"{planet_choice} is not visible on {day_of_week} due to a/an {chart_df['worst_penalty_name'][0].replace('_', ' ').title()}.", text_alignment='center')
 
         elif (min(final_data[0]) == 0):
             st.caption (f"{planet_choice} may not be visible some hours due to having an altitude below the horizon or full cloud coverage.", text_alignment = 'center')
@@ -218,10 +219,10 @@ def display_visual(user_lat: str,
         penalties["bortle_penalty"].append(int(bortle_penalty))
 
         # Planet altidude penalty --> handle bigger effects closer to horizon using airmass formula
-        airmass = 1.0 / (math.sin(math.radians(planet_altitude + 5.0)))
+        airmass = 1.0 / (math.sin(math.radians(planet_altitude + 2.0)))
         planet_multiplier = 1.0 - (airmass * .1)
         planet_multiplier = max(.1, min(1.0, planet_multiplier))
-
+        print("Planet altitude: ")
         #calculate total score
         before_planet_multiplier = 100 - (cloud_cover_penalty + visibility_penalty + moon_penalty + bortle_penalty)
         viewing_score = (before_planet_multiplier * planet_multiplier)
@@ -230,7 +231,7 @@ def display_visual(user_lat: str,
 
         if ((visibility_meters < 2000) or (cloud_cover > 95)):
             viewing_score *= .2
-        if (planet_altitude < 0):
+        if (planet_altitude < 5):
             viewing_score = 0
             penalties["altitude_penalty"].pop()
             penalties["altitude_penalty"].append(100)
@@ -255,8 +256,10 @@ def display_visual(user_lat: str,
         sunset_hour = int(pd.to_datetime(target_sunset).hour)
         sunrise_hour = int(pd.to_datetime(target_sunrise).hour)
 
-
-        target_date = pd.to_datetime(target_row["date"]).tz_localize(None).to_pydatetime()
+        #convert utc to local time
+        local_tz = response.Timezone().decode()
+        target_date = pd.to_datetime(target_row["date"]).tz_convert(local_tz).to_pydatetime()
+        
 
 
         day_shift = target_index * 24
@@ -278,7 +281,8 @@ def display_visual(user_lat: str,
             
 
             if (i < sunrise_hour or (i > sunset_hour)):
-                specific_hour_time  = target_date.replace(hour = i, minute = 0, second = 0, microsecond =0, tzinfo=timezone.utc)
+                specific_hour_time  = target_date.replace(hour = i, minute = 0, second = 0, microsecond =0)
+                utc_hour_time = specific_hour_time.astimezone(timezone.utc)
                 current_time = ts.from_datetime(specific_hour_time)
         
 
@@ -291,7 +295,7 @@ def display_visual(user_lat: str,
                 planet_target = eph[planet_choice.lower() + " barycenter"]
                 
                 position = observer.at(current_time).observe(planet_target)
-                planet_alt, az, distance = position.apparent().altaz()
+                planet_alt, extra, extra2 = position.apparent().altaz()
                 planet_altitude = planet_alt.degrees
             
                 moon_illumination = ((1.0 - math.cos(sep.radians)) / 2.0) * 100
@@ -310,6 +314,7 @@ def display_visual(user_lat: str,
                     time_data.append("12 am")
                 else:
                     time_data.append(str(i) +" am")
+                print(f"Checking hour {i}: Local time = {specific_hour_time}, UTC time = {utc_hour_time}, Altitude = {planet_altitude}")
         all_data.append(scores_data)
         all_data.append(time_data)
         
@@ -390,10 +395,10 @@ def display_visual(user_lat: str,
 
 
     
-    # 1. Tell Skyfield where the user is standing
+    # Tell Skyfield where the user is standing
     observer = earth + wgs84.latlon(user_location["latitude"], user_location["longitude"])
 
-    # 2. Tell Skyfield what time it is right now
+    #  tell Skyfield what time it is right now
     ts = load.timescale()
     current_time = ts.now()
 
